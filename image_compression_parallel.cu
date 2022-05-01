@@ -1,5 +1,5 @@
 // nvcc image_compression_parallel.cu -o parallel -lm -lcufft -w
-// ./parallel
+// ./parallel 1
 
 #include<stdint.h>
 #include<stdlib.h>
@@ -21,13 +21,10 @@
 #include "stb_image_write.h"
 
 // #define STB_IMAGE_WRITE_IMPLEMENTATION
-#define INPUTFILE "image.png"
-#define OUTPUT_GRAY_PNG "image_gray.png"
-#define OUTPUTFILE_JPG "result.jpg"
-#define OUTPUTFILE_PNG "result.png"
+#define INPUTFILE "./input_images/image.png"
+#define OUTPUT_GRAY_PNG "./result_images/image_gray.png"
+#define OUTPUTFILE_JPG "./result_images/result_gray.jpg"
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
-#define THRESHOLD 0.1
-
 
 __host__ __device__ bool operator> (const cufftDoubleComplex& a, const cufftDoubleComplex& b){
   return sqrt(a.x * a.x + a.y * a.y) > sqrt(b.x * b.x + b.y * b.y);
@@ -161,6 +158,9 @@ void generateArray(cufftDoubleComplex*dest, int row, int col){
 }
 
 int main(int argc, char* argv[]) {
+
+  assert(argc == 2);
+  double THRESHOLD = atof(argv[1]);
 
   // Pointer to the memory of image on device
   cufftDoubleComplex *gray_image_dev, *fft_result, *Ifft_result;
